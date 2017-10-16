@@ -18,7 +18,7 @@ enum _J_Attachments
 	Float:_J_ScaleY,
 	Float:_J_ScaleZ,
 	_J_MaterialColor1,
-	_J_MaterialColor2
+	_J_MaterialColor2,
 }
 
 /*Macros*/
@@ -32,7 +32,9 @@ enum _J_Attachments
 
 /*Variables*/
 static 
-	_J_AttachmentsEnum[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS][_J_Attachments];
+	_J_AttachmentsEnum[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS][_J_Attachments],
+	bool:_J_AimedWithValidWeap[MAX_PLAYERS];
+	
 
 /*Callbacks*/
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
@@ -45,6 +47,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			{
 				case 34..36, 43:
 				{
+					_J_AimedWithValidWeap[playerid] = true;
 					for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 					{
 						if(IsPlayerAttachedObjectSlotUsed(playerid, i))
@@ -67,39 +70,53 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		
 		else if(RELEASED(128))
 		{
-			for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
+			if(_J_AimedWithValidWeap[playerid])
 			{
-				if(IsPlayerAttachedObjectSlotUsed(playerid, i))
+				_J_AimedWithValidWeap[playerid] = false;
+				for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 				{
-					new BitStream:bs = BS_New(); 
+					if(IsPlayerAttachedObjectSlotUsed(playerid, i))
+					{
+						new BitStream:bs = BS_New(); 
 
-					BS_WriteValue(
-						bs, 
-						PR_UINT16, playerid, 
-						PR_UINT32, i,
-						PR_BOOL, 1,
-						PR_UINT32, _J_AttachmentsEnum[playerid][i][_J_ModelID],
-						PR_UINT32, _J_AttachmentsEnum[playerid][i][_J_Bone],
-						PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_OffsetX],
-						PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_OffsetY],
-						PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_OffsetZ],
-						PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_RotX],
-						PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_RotY],
-						PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_RotZ],
-						PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_ScaleX],
-						PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_ScaleY],
-						PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_ScaleZ],
-						PR_UINT32, _J_AttachmentsEnum[playerid][i][_J_MaterialColor1],
-						PR_UINT32, _J_AttachmentsEnum[playerid][i][_J_MaterialColor2]
-					);  
+						BS_WriteValue(
+							bs, 
+							PR_UINT16, playerid, 
+							PR_UINT32, i,
+							PR_BOOL, 1,
+							PR_UINT32, _J_AttachmentsEnum[playerid][i][_J_ModelID],
+							PR_UINT32, _J_AttachmentsEnum[playerid][i][_J_Bone],
+							PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_OffsetX],
+							PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_OffsetY],
+							PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_OffsetZ],
+							PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_RotX],
+							PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_RotY],
+							PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_RotZ],
+							PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_ScaleX],
+							PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_ScaleY],
+							PR_FLOAT, _J_AttachmentsEnum[playerid][i][_J_ScaleZ],
+							PR_UINT32, _J_AttachmentsEnum[playerid][i][_J_MaterialColor1],
+							PR_UINT32, _J_AttachmentsEnum[playerid][i][_J_MaterialColor2]
+						);  
 
-					BS_RPC(bs, playerid, 113, PR_LOW_PRIORITY, PR_RELIABLE_ORDERED); 	
+						BS_RPC(bs, playerid, 113, PR_LOW_PRIORITY, PR_RELIABLE_ORDERED); 	
+					}
 				}
 			}
 		}
 	}
 	#if defined J_OnPlayerKeyStateChange
 		return J_OnPlayerKeyStateChange(playerid, newkeys, oldkeys);
+	#else
+		return 1;
+	#endif
+}
+
+public OnPlayerConnect(playerid)
+{
+	_J_AimedWithValidWeap[playerid] = false;
+	#if defined J_OnPlayerConnect
+		return J_OnPlayerConnect(playerid);
 	#else
 		return 1;
 	#endif
@@ -150,3 +167,13 @@ stock J_SetPlayerAttachedObject(playerid, index, modelid, bone, Float:fOffsetX =
 forward J_OnPlayerKeyStateChange(playerid, newkeys, oldkeys);
 #endif
 
+#if defined _ALS_OnPlayerConnect
+#undef OnPlayerConnect
+#else
+#define _ALS_OnPlayerConnect
+#endif
+#define OnPlayerConnect J_OnPlayerConnect
+
+#if defined J_OnPlayerConnect
+forward J_OnPlayerConnect(playerid);
+#endif
