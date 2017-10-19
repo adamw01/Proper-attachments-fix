@@ -1,9 +1,12 @@
 /*
-Attachment Fix
-Jelly23
+	Attachment Fix for SA-MP Weapons
+	Created By - Jelly23
 */
 
-/*Enumerator*/
+// ** ENUMERATORS
+
+// *** ATTACHMENTS
+
 enum _J_Attachments
 {
 	_J_ModelID,
@@ -21,7 +24,8 @@ enum _J_Attachments
 	_J_MaterialColor2,
 }
 
-/*Macros*/
+// ** MACROS
+
 #if ! defined HOLDING
     #define HOLDING(%0) ((newkeys & (%0)) == (%0))
 #endif
@@ -30,13 +34,17 @@ enum _J_Attachments
 	#define RELEASED(%0) (((newkeys & (%0)) != (%0)) && ((oldkeys & (%0)) == (%0)))
 #endif
 
-/*Variables*/
-static 
-	_J_AttachmentsEnum[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS][_J_Attachments],
-	bool:_J_AimedWithValidWeap[MAX_PLAYERS];
-	
+// ** VARIABLES
 
-/*Callbacks*/
+// *** MAIN
+
+static _J_AttachmentsEnum[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS][_J_Attachments],
+bool:_J_AimedWithValidWeap[MAX_PLAYERS];
+	
+// ** MAIN
+
+// *** SA-MP CALLBACKS
+
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
 	if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
@@ -122,7 +130,8 @@ public OnPlayerConnect(playerid)
 	#endif
 }
 
-/*Functions*/
+// ** FUNCTIONS
+
 stock J_SetPlayerAttachedObject(playerid, index, modelid, bone, Float:fOffsetX = 0.0, Float:fOffsetY = 0.0, Float:fOffsetZ = 0.0, Float:fRotX = 0.0, Float:fRotY = 0.0, Float:fRotZ = 0.0, Float:fScaleX = 1.0, Float:fScaleY = 1.0, Float:fScaleZ = 1.0, materialcolor1 = 0, materialcolor2 = 0)
 {
     _J_AttachmentsEnum[playerid][index][_J_ModelID] = modelid;
@@ -147,7 +156,10 @@ stock J_SetPlayerAttachedObject(playerid, index, modelid, bone, Float:fOffsetX =
     return SetPlayerAttachedObject(playerid, index, modelid, bone, fOffsetX, fOffsetY, fOffsetZ, fRotX, fRotY, fRotZ, fScaleX, fScaleY, fScaleZ, materialcolor1, materialcolor2);
 }
 
-/*Hooks*/
+// ** HOOKS
+
+// *** ATTACHMENTS
+
 #if defined _ALS_SetPlayerAttachedObject
 #undef SetPlayerAttachedObject
 #else
@@ -155,6 +167,8 @@ stock J_SetPlayerAttachedObject(playerid, index, modelid, bone, Float:fOffsetX =
 #endif
  
 #define SetPlayerAttachedObject J_SetPlayerAttachedObject
+
+// *** STATES
 
 #if defined _ALS_OnPlayerKeyStateChange
 #undef OnPlayerKeyStateChange
@@ -166,6 +180,8 @@ stock J_SetPlayerAttachedObject(playerid, index, modelid, bone, Float:fOffsetX =
 #if defined J_OnPlayerKeyStateChange
 forward J_OnPlayerKeyStateChange(playerid, newkeys, oldkeys);
 #endif
+
+// *** SA-MP MAIN
 
 #if defined _ALS_OnPlayerConnect
 #undef OnPlayerConnect
