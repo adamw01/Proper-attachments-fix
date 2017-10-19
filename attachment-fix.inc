@@ -49,7 +49,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
 	if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
 	{
-		if(HOLDING(128))
+		if(HOLDING(128)) // Possible macro definition
 		{
 			switch(GetPlayerWeapon(playerid))
 			{
@@ -76,7 +76,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			}
 		}
 		
-		else if(RELEASED(128))
+		else if(RELEASED(128)) // Possible macro definition
 		{
 			if(_J_AimedWithValidWeap[playerid])
 			{
