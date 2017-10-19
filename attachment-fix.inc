@@ -122,7 +122,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 public OnPlayerConnect(playerid)
 {
-	_J_AimedWithValidWeap[playerid] = false;
+	_J_AimedWithValidWeap[playerid] = false; // Set to false on OnPlayerDisconnect too.
 	#if defined J_OnPlayerConnect
 		return J_OnPlayerConnect(playerid);
 	#else
