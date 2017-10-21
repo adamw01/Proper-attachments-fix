@@ -3,6 +3,10 @@
 	Created By - Jelly23
 */
 
+#if ! defined PAWNRAKNET_INC_
+	#error You must have Pawn.Raknet include in order to use this one.
+#endif
+
 // ** ENUMERATORS
 
 // *** ATTACHMENTS
@@ -153,7 +157,11 @@ stock J_SetPlayerAttachedObject(playerid, index, modelid, bone, Float:fOffsetX =
 	_J_AttachmentsEnum[playerid][index][_J_MaterialColor1] = materialcolor1;
 	_J_AttachmentsEnum[playerid][index][_J_MaterialColor2] = materialcolor2;
 	
-    return SetPlayerAttachedObject(playerid, index, modelid, bone, fOffsetX, fOffsetY, fOffsetZ, fRotX, fRotY, fRotZ, fScaleX, fScaleY, fScaleZ, materialcolor1, materialcolor2);
+    #if defined J_OnPlayerEditAttachedObject
+		return J_OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Float:fOffsetX, Float:fOffsetY, Float:fOffsetZ, Float:fRotX, Float:fRotY, Float:fRotZ, Float:fScaleX, Float:fScaleY, Float:fScaleZ);
+	#else
+		return 1;
+	#endif
 }
 
 // ** HOOKS
@@ -192,4 +200,15 @@ forward J_OnPlayerKeyStateChange(playerid, newkeys, oldkeys);
 
 #if defined J_OnPlayerConnect
 forward J_OnPlayerConnect(playerid);
+#endif
+
+#if defined _ALS_OnPlayerEditAttachedObject
+#undef OnPlayerEditAttachedObject
+#else
+#define _ALS_OnPlayerEditAttachedObject
+#endif
+#define OnPlayerEditAttachedObject J_OnPlayerEditAttachedObject
+
+#if defined J_OnPlayerEditAttachedObject
+forward J_OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Float:fOffsetX, Float:fOffsetY, Float:fOffsetZ, Float:fRotX, Float:fRotY, Float:fRotZ, Float:fScaleX, Float:fScaleY, Float:fScaleZ);
 #endif
